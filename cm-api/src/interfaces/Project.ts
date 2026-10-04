@@ -5,7 +5,7 @@ export type ProjectStatus = (typeof PROJECT_STATUSES)[number];
 export type ProjectPriority = (typeof PROJECT_PRIORITIES)[number];
 
 export interface ProjectPayload {
-    clientName: string;
+    clientId: number;
     projectName: string;
     description?: string | null;
     status: ProjectStatus;
@@ -14,9 +14,9 @@ export interface ProjectPayload {
     dueDate?: string | null;
 }
 
-// Raw request body before validation; the Joi schema in models/Project decides what is accepted.
+// Raw request body before validation; the Joi schema in validators/projectValidator decides what is accepted.
 export interface ProjectRequestBody {
-    clientName?: unknown;
+    clientId?: unknown;
     projectName?: unknown;
     description?: unknown;
     status?: unknown;
@@ -31,6 +31,8 @@ export interface ProjectIdParams {
 
 export interface ProjectRecord extends ProjectPayload {
     id: number;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface ProjectValidationResult {

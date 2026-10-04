@@ -1,9 +1,12 @@
 import type { Request, Response } from "express";
+import { ForeignKeyConstraintError } from "sequelize";
 import { Project } from "../models/Project";
 import type { ProjectIdParams, ProjectRequestBody } from "../interfaces/Project";
 import { validateProjectId, validateProjectPayload } from "../validators/projectValidator";
 
 function handleUnexpectedError(res: Response, error: unknown) {
+    // Only projects.client_id references another table, so this means the client does not exist.
+    if (error instanceof ForeignKeyConstraintError) return res.status(400).json({ errors: ["Client not found."] });
     console.error("Project request failed:", error);
     return res.status(500).json({ error: "An unexpected error occurred." });
 }

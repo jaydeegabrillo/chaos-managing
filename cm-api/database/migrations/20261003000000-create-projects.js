@@ -9,9 +9,15 @@ module.exports = {
                 autoIncrement: true,
                 allowNull: false,
             },
-            client_name: {
-                type: Sequelize.TEXT,
+            client_id: {
+                type: Sequelize.INTEGER,
                 allowNull: false,
+                references: {
+                    model: "clients",
+                    key: "id",
+                },
+                onUpdate: "CASCADE",
+                onDelete: "RESTRICT",
             },
             project_name: {
                 type: Sequelize.TEXT,
@@ -37,7 +43,19 @@ module.exports = {
                 type: Sequelize.DATEONLY,
                 allowNull: true,
             },
+            created_at: {
+                type: Sequelize.DATE,
+                allowNull: false,
+                defaultValue: Sequelize.fn("NOW"),
+            },
+            updated_at: {
+                type: Sequelize.DATE,
+                allowNull: false,
+                defaultValue: Sequelize.fn("NOW"),
+            }
         });
+
+        await queryInterface.addIndex("projects", ["client_id"]);
 
         await queryInterface.sequelize.query(`
             ALTER TABLE projects

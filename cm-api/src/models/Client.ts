@@ -1,46 +1,36 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/database";
-import type { ProjectPayload, ProjectRecord } from "../interfaces/Project";
+import type { ClientPayload, ClientRecord } from "../interfaces/Client";
 
-const Project = sequelize.define<Model<ProjectRecord, ProjectPayload>>(
-    "Project",
+const Client = sequelize.define<Model<ClientRecord, ClientPayload>>(
+    "Client",
     {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true,
         },
-        clientId: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            field: "client_id",
-        },
-        projectName: {
+        name: {
             type: DataTypes.TEXT,
             allowNull: false,
-            field: "project_name",
         },
-        description: {
+        contactPerson: {
+            type: DataTypes.TEXT,
+            allowNull: true,
+            field: "contact_person",
+        },
+        email: {
+            type: DataTypes.TEXT,
+            allowNull: true,
+            unique: true,
+        },
+        phone: {
             type: DataTypes.TEXT,
             allowNull: true,
         },
-        status: {
+        address: {
             type: DataTypes.TEXT,
-            allowNull: false,
-        },
-        priority: {
-            type: DataTypes.TEXT,
-            allowNull: false,
-        },
-        startDate: {
-            type: DataTypes.DATEONLY,
             allowNull: true,
-            field: "start_date",
-        },
-        dueDate: {
-            type: DataTypes.DATEONLY,
-            allowNull: true,
-            field: "due_date",
         },
         createdAt: {
             type: DataTypes.DATE,
@@ -54,10 +44,10 @@ const Project = sequelize.define<Model<ProjectRecord, ProjectPayload>>(
         },
     },
     {
-        tableName: "projects",
+        tableName: "clients",
         timestamps: true,
         underscored: true,
     }
 );
 
-export { Project };
+export { Client };

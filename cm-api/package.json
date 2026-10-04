@@ -10,7 +10,9 @@
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
     "db:migrate": "sequelize-cli db:migrate",
-    "db:migrate:undo": "sequelize-cli db:migrate:undo"
+    "db:migrate:undo": "sequelize-cli db:migrate:undo",
+    "db:seed": "sequelize-cli db:seed:all",
+    "db:seed:undo": "sequelize-cli db:seed:undo:all"
   },
   "repository": {
     "type": "git",

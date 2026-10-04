@@ -7,10 +7,11 @@ import {
     type ProjectValidationResult,
 } from "../interfaces/Project";
 const projectPayloadSchema = Joi.object<ProjectPayload>({
-    clientName: Joi.string().trim().required().messages({
-        "any.required": "Client Name is required.",
-        "string.empty": "Client Name is required.",
-        "string.base": "Client Name must be a string.",
+    clientId: Joi.number().integer().positive().required().messages({
+        "any.required": "Client ID is required.",
+        "number.base": "Client ID must be a positive integer.",
+        "number.integer": "Client ID must be a positive integer.",
+        "number.positive": "Client ID must be a positive integer.",
     }),
     projectName: Joi.string().trim().required().messages({
         "any.required": "Project Name is required.",
