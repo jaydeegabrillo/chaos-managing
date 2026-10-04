@@ -2,9 +2,15 @@
   "name": "fullstack-developer-assessment",
   "version": "1.0.0",
   "description": "Thank you for your interest in joining our team.",
-  "main": "index.js",
+  "main": "dist/server.js",
+  "packageManager": "pnpm@11.25.0",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "dev": "nodemon --watch src --ext ts --exec ts-node src/server.ts",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit",
+    "db:migrate": "sequelize-cli db:migrate",
+    "db:migrate:undo": "sequelize-cli db:migrate:undo"
   },
   "repository": {
     "type": "git",
@@ -22,9 +28,17 @@
     "cors": "^2.8.6",
     "dotenv": "^18.0.5",
     "express": "^5.2.1",
-    "pg": "^8.23.1"
+    "joi": "^18.2.8",
+    "pg": "^8.23.1",
+    "sequelize": "^6.37.7"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14"
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.5",
+    "@types/node": "^24.10.1",
+    "nodemon": "^3.1.14",
+    "sequelize-cli": "^6.6.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   }
 }
