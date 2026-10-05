@@ -26,6 +26,17 @@ describe('projects list', () => {
     expect(screen.getByText('GreenLeaf Cafe')).toBeInTheDocument()
   })
 
+  it('separates status and priority filters from project search', async () => {
+    renderRoute('/projects')
+
+    const filterSection = screen.getByRole('region', { name: 'Filters' })
+    const listSection = screen.getByRole('region', { name: 'Project list' })
+    expect(within(filterSection).getByRole('combobox', { name: 'Filter by status' })).toHaveValue('')
+    expect(within(filterSection).getByRole('combobox', { name: 'Filter by priority' })).toHaveValue('')
+    expect(within(filterSection).queryByRole('searchbox')).not.toBeInTheDocument()
+    expect(within(listSection).getByRole('searchbox', { name: 'Search projects' })).toBeInTheDocument()
+  })
+
   it('shows an empty state when there are no projects', async () => {
     renderRoute('/projects')
     expect(await screen.findByRole('heading', { name: 'No projects yet' })).toBeInTheDocument()

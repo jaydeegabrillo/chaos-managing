@@ -64,6 +64,7 @@ Open [http://localhost:5173](http://localhost:5173). Keep the API running in a s
 ## Stack
 
 - Vite, React 19, and TypeScript
+- Poppins typography
 - React Router for routing and lazy-loaded create/edit pages
 - TanStack Query for server state, caching, and mutation invalidation
 - React Hook Form and Zod for form handling and validation
@@ -72,7 +73,7 @@ Open [http://localhost:5173](http://localhost:5173). Keep the API running in a s
 
 ## Features
 
-- Project list with client, status, priority, and schedule information
+- Project list with client, status, priority, and schedule information, with separate filter and project-list cards
 - Responsive sidebar navigation for Projects and Clients
 - Client directory showing the seeded client reference list
 - Client-side search, filters, and sorting, with view state stored in the URL

@@ -6,7 +6,7 @@ import { ErrorPanel } from '@/components/ui/error-panel'
 import { errorMessages } from '@/api/http'
 import { daysBetween, parseDateOnly, startOfToday } from '@/lib/dates'
 import { DeleteProjectDialog } from '../components/DeleteProjectDialog'
-import { ProjectFiltersBar } from '../components/ProjectFiltersBar'
+import { ProjectFiltersBar, ProjectSearchInput } from '../components/ProjectFiltersBar'
 import { ProjectTable, ProjectTableSkeleton } from '../components/ProjectTable'
 import { DEFAULT_FILTERS, filterAndSortProjects, readFilters, writeFilters, type ProjectFilters, type SortField } from '../filtering'
 import { useProjects } from '../queries'
@@ -64,7 +64,7 @@ export default function ProjectsListPage() {
   }
 
   return (
-    <>
+    <div className="flex min-h-full flex-col">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">Projects</h1>
@@ -85,13 +85,29 @@ export default function ProjectsListPage() {
         </Button>
       </div>
 
-      <div className="mt-8 flex flex-col gap-4">
+      <section aria-labelledby="project-filters-heading" className="mt-8 rounded-xl border border-line/80 bg-surface p-5 shadow-[0_1px_3px_rgba(37,36,35,0.04)] sm:p-6">
+        <h2 id="project-filters-heading" className="mb-4 font-display text-sm font-semibold tracking-wide text-muted">
+          Filters
+        </h2>
         <ProjectFiltersBar
           filters={filters}
           onChange={updateFilters}
           onClear={() => updateFilters({ ...DEFAULT_FILTERS, sort, dir })}
         />
+      </section>
 
+      <section aria-labelledby="project-list-heading" className="mt-5 min-h-80 flex-1 overflow-hidden rounded-xl border border-line/80 bg-surface shadow-[0_1px_3px_rgba(37,36,35,0.04)]">
+        <div className="flex flex-col gap-4 border-b border-line/80 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <div>
+            <h2 id="project-list-heading" className="font-display text-lg font-semibold">
+              Project list
+            </h2>
+            <p className="mt-0.5 text-xs text-muted">Keep track of work, ownership and timelines</p>
+          </div>
+          <div className="w-full sm:max-w-sm">
+            <ProjectSearchInput query={filters.q} onChange={(q) => updateFilters({ q })} />
+          </div>
+        </div>
         {isPending ? (
           <ProjectTableSkeleton />
         ) : error ? (
@@ -121,17 +137,19 @@ export default function ProjectsListPage() {
             </Button>
           </div>
         ) : (
-          <ProjectTable
-            projects={visibleProjects}
-            today={today}
-            sort={sort}
-            dir={dir}
-            onSort={handleSort}
-            onDelete={setProjectToDelete}
-            onEdit={openEditDialog}
-          />
+          <div className="px-2 pb-2 sm:px-3">
+            <ProjectTable
+              projects={visibleProjects}
+              today={today}
+              sort={sort}
+              dir={dir}
+              onSort={handleSort}
+              onDelete={setProjectToDelete}
+              onEdit={openEditDialog}
+            />
+          </div>
         )}
-      </div>
+      </section>
 
       <DeleteProjectDialog project={projectToDelete} onClose={() => setProjectToDelete(null)} />
       <Suspense fallback={null}>
@@ -144,6 +162,6 @@ export default function ProjectsListPage() {
         ) : null}
         {hasOpenedCreate ? <LazyProjectCreateDialog open={isCreateOpen} onClose={() => setIsCreateOpen(false)} /> : null}
       </Suspense>
-    </>
+    </div>
   )
 }

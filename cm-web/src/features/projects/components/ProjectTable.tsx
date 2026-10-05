@@ -41,7 +41,7 @@ function SortHeader({
     <th
       scope="col"
       aria-sort={active ? (dir === 'asc' ? 'ascending' : 'descending') : 'none'}
-      className={cn('px-4 py-3 text-left font-medium', className)}
+      className={cn('px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wide', className)}
     >
       <button
         type="button"
@@ -71,7 +71,7 @@ const ProjectRow = memo(function ProjectRow({
 }) {
   return (
     <tr className="border-t border-line align-top transition-colors hover:bg-canvas/60">
-      <td className="max-w-80 px-4 py-4">
+      <td className="max-w-80 px-4 py-4.5">
         <Link
           to={`/projects/${project.id}/edit`}
           className="font-display text-base font-semibold text-ink underline-offset-4 hover:underline"
@@ -80,14 +80,14 @@ const ProjectRow = memo(function ProjectRow({
         </Link>
         {project.description ? <p className="mt-1 line-clamp-2 text-sm text-muted">{project.description}</p> : null}
       </td>
-      <td className="whitespace-nowrap px-4 py-4 text-sm">{getClientName(project.clientId)}</td>
-      <td className="px-4 py-4">
+      <td className="whitespace-nowrap px-4 py-4.5 text-sm text-muted">{getClientName(project.clientId)}</td>
+      <td className="px-4 py-4.5">
         <StatusIndicator status={project.status} />
       </td>
-      <td className="px-4 py-4">
+      <td className="px-4 py-4.5">
         <PriorityMeter priority={project.priority} />
       </td>
-      <td className="px-4 py-4">
+      <td className="px-4 py-4.5">
         <ScheduleRail project={project} today={today} />
       </td>
       <td className="px-4 py-3 text-right">
@@ -112,9 +112,9 @@ const ProjectRow = memo(function ProjectRow({
 
 export function ProjectTable({ projects, today, sort, dir, onSort, onDelete, onEdit }: ProjectTableProps) {
   return (
-    <div className="overflow-x-auto rounded-lg border border-line bg-surface">
+    <div className="overflow-x-auto">
       <table className="w-full min-w-[56rem] border-collapse text-sm">
-        <thead className="bg-canvas/50">
+        <thead className="bg-canvas/70">
           <tr>
             {COLUMNS.map((column) => (
               <SortHeader key={column.field} {...column} sort={sort} dir={dir} onSort={onSort} />

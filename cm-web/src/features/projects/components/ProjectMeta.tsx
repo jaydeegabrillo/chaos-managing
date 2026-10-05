@@ -3,9 +3,16 @@ import { statusColor } from '../status'
 import { PROJECT_PRIORITIES, type ProjectPriority, type ProjectStatus } from '../types'
 
 export function StatusIndicator({ status }: { status: ProjectStatus }) {
+  const statusBadge: Record<ProjectStatus, string> = {
+    Planning: 'bg-status-planning/10 text-status-planning',
+    'In Progress': 'bg-status-progress/10 text-status-progress',
+    'On Hold': 'bg-status-hold/10 text-status-hold',
+    Completed: 'bg-status-done/10 text-status-done',
+  }
+
   return (
-    <span className="inline-flex items-center gap-2 whitespace-nowrap text-sm">
-      <span className={cn('size-2 rounded-full', statusColor[status])} aria-hidden="true" />
+    <span className={cn('inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium', statusBadge[status])}>
+      <span className={cn('size-1.5 rounded-full', statusColor[status])} aria-hidden="true" />
       {status}
     </span>
   )

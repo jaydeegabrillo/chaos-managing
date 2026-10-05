@@ -61,19 +61,20 @@
 }
 
 @theme {
-  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
-  --font-display: 'Bricolage Grotesque Variable', 'IBM Plex Sans', ui-sans-serif, sans-serif;
+  --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Poppins', ui-sans-serif, system-ui, sans-serif;
 
-  /* Base palette */
-  --color-canvas: #eef1f5;
+  --color-canvas: #f7f6f4;
   --color-surface: #ffffff;
-  --color-ink: #172033;
-  --color-muted: #5b6577;
-  --color-line: #d9dee6;
-  --color-primary: #0f5257;
-  --color-primary-hover: #0a3d41;
+  --color-ink: #252423;
+  --color-muted: #77736f;
+  --color-line: #e8e5e1;
+  --color-primary: #e76f63;
+  --color-primary-hover: #d85e53;
   --color-danger: #b42318;
   --color-warning: #a8480f;
+  --color-sidebar: #f4f2ef;
+  --color-accent-soft: #fbe9e6;
 
   /* Status hues — each used for a dot and a schedule rail */
   --color-status-planning: #6d5bd0;

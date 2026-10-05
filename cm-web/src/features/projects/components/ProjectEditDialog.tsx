@@ -1,11 +1,9 @@
-import { useState } from 'react'
 import { toast } from 'sonner'
 import { errorMessages, isNotFound } from '@/api/http'
 import { Button } from '@/components/ui/button'
 import { ErrorPanel } from '@/components/ui/error-panel'
 import { NotFound } from '@/app/NotFound'
 import { getClientName } from '../clients'
-import { DeleteProjectDialog } from './DeleteProjectDialog'
 import { ProjectDrawer } from './ProjectDrawer'
 import { ProjectForm } from './ProjectForm'
 import { useProject, useUpdateProject } from '../queries'
@@ -19,7 +17,6 @@ type ProjectEditDialogProps = {
 }
 
 export default function ProjectEditDialog({ project, open, onClose }: ProjectEditDialogProps) {
-  const [confirmDelete, setConfirmDelete] = useState(false)
   const projectId = project?.id ?? 0
   const { data, error, isPending, refetch } = useProject(projectId, open && project !== null)
   const updateMutation = useUpdateProject(projectId)
@@ -78,19 +75,7 @@ export default function ProjectEditDialog({ project, open, onClose }: ProjectEdi
             onSubmit={handleSubmit}
           />
         ) : null}
-        {data ? (
-          <div className="border-t border-line pt-4">
-            <Button variant="secondary" onClick={() => setConfirmDelete(true)} className="hover:text-danger">
-              Delete project
-            </Button>
-          </div>
-        ) : null}
       </ProjectDrawer>
-      <DeleteProjectDialog
-        project={confirmDelete && open ? data ?? null : null}
-        onClose={() => setConfirmDelete(false)}
-        onDeleted={onClose}
-      />
     </>
   )
 }
