@@ -1,0 +1,110 @@
+@import 'tailwindcss';
+
+@keyframes project-drawer-enter {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes project-drawer-exit {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+@keyframes project-drawer-overlay-enter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes project-drawer-overlay-exit {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+.project-drawer-content[data-state='open'] {
+  animation: project-drawer-enter 220ms ease-out;
+}
+
+.project-drawer-content[data-state='closed'] {
+  animation: project-drawer-exit 180ms ease-in;
+}
+
+.project-drawer-overlay[data-state='open'] {
+  animation: project-drawer-overlay-enter 220ms ease-out;
+}
+
+.project-drawer-overlay[data-state='closed'] {
+  animation: project-drawer-overlay-exit 180ms ease-in;
+}
+
+@theme {
+  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Bricolage Grotesque Variable', 'IBM Plex Sans', ui-sans-serif, sans-serif;
+
+  /* Base palette */
+  --color-canvas: #eef1f5;
+  --color-surface: #ffffff;
+  --color-ink: #172033;
+  --color-muted: #5b6577;
+  --color-line: #d9dee6;
+  --color-primary: #0f5257;
+  --color-primary-hover: #0a3d41;
+  --color-danger: #b42318;
+  --color-warning: #a8480f;
+
+  /* Status hues — each used for a dot and a schedule rail */
+  --color-status-planning: #6d5bd0;
+  --color-status-progress: #1d7c8f;
+  --color-status-hold: #b7791f;
+  --color-status-done: #3f7d4e;
+}
+
+@layer base {
+  html {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    min-height: 100dvh;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
