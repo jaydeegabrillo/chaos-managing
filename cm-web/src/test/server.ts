@@ -31,7 +31,19 @@ const url = (path: string) => `${API_URL}${path}`
 const notFound = () => HttpResponse.json({ error: 'Project not found.' }, { status: 404 })
 
 export const handlers = [
-  http.get(url('/projects'), () => HttpResponse.json(db.projects)),
+  http.get(url('/projects'), ({ request }) => {
+    const search = new URL(request.url).searchParams
+    const page = Number(search.get('page') ?? 1)
+    const limit = Number(search.get('limit') ?? (db.projects.length || 1))
+    const offset = (page - 1) * limit
+    return HttpResponse.json({
+      data: db.projects.slice(offset, offset + limit),
+      page,
+      limit,
+      totalItems: db.projects.length,
+      totalPages: Math.ceil(db.projects.length / limit) || 1,
+    })
+  }),
 
   http.get(url('/projects/:id'), ({ params }) => {
     const project = db.projects.find((p) => p.id === Number(params.id))

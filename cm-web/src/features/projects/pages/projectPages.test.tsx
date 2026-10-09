@@ -24,6 +24,26 @@ describe('projects list', () => {
     expect(await screen.findByRole('link', { name: 'Website Redesign' })).toBeInTheDocument()
     expect(screen.getByText('Acme Corporation')).toBeInTheDocument()
     expect(screen.getByText('GreenLeaf Cafe')).toBeInTheDocument()
+    expect(screen.getByText('Page 1 of 1')).toBeInTheDocument()
+  })
+
+  it('paginates projects and keeps the selected page in the URL', async () => {
+    db.reset(Array.from({ length: 12 }, (_, index) =>
+      makeProject({ id: index + 1, projectName: `Project ${index + 1}` }),
+    ))
+    const { user, router } = renderRoute('/projects')
+    expect(await screen.findByRole('link', { name: 'Project 1' })).toBeInTheDocument()
+    expect(screen.getByText('Showing 1–10 of 12')).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Project 11' })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Go to next page' }))
+    expect(await screen.findByRole('link', { name: 'Project 11' })).toBeInTheDocument()
+    expect(screen.getByText('Showing 11–12 of 12')).toBeInTheDocument()
+    expect(router.state.location.search).toBe('?page=2')
+
+    await user.click(screen.getByRole('button', { name: 'Go to previous page' }))
+    expect(await screen.findByRole('link', { name: 'Project 1' })).toBeInTheDocument()
+    expect(router.state.location.search).toBe('')
   })
 
   it('separates status and priority filters from project search', async () => {
@@ -107,7 +127,7 @@ describe('projects list', () => {
     await user.selectOptions(screen.getByLabelText(/Priority/), 'High')
     await user.click(screen.getByRole('button', { name: 'Create project' }))
 
-    expect(await screen.findByText('Created “Drawer Project”')).toBeInTheDocument()
+    expect(await screen.findByText('Created “Drawer Project”', {}, { timeout: 3000 })).toBeInTheDocument()
     expect(router.state.location.pathname).toBe('/projects')
     expect(db.projects).toMatchObject([{ projectName: 'Drawer Project', clientId: 4, priority: 'High', status: 'Planning' }])
   })
@@ -120,7 +140,7 @@ describe('projects list', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Delete project' }))
 
     await waitFor(() => expect(screen.queryByRole('link', { name: 'Menu App' })).not.toBeInTheDocument())
-    expect(await screen.findByText('Deleted “Menu App”')).toBeInTheDocument()
+    expect(await screen.findByText('Deleted “Menu App”', {}, { timeout: 3000 })).toBeInTheDocument()
     expect(db.projects.map((p) => p.id)).toEqual([1])
   })
 })
@@ -148,7 +168,7 @@ describe('create project', () => {
     await user.selectOptions(screen.getByLabelText(/Priority/), 'High')
     await user.click(screen.getByRole('button', { name: 'Create project' }))
 
-    expect(await screen.findByText('Created “Loyalty Program”')).toBeInTheDocument()
+    expect(await screen.findByText('Created “Loyalty Program”', {}, { timeout: 3000 })).toBeInTheDocument()
     expect(router.state.location.pathname).toBe('/projects')
     expect(db.projects).toMatchObject([{ projectName: 'Loyalty Program', clientId: 4, priority: 'High', status: 'Planning' }])
   })
@@ -176,15 +196,19 @@ describe('edit project', () => {
     const { user, router } = renderRoute('/projects/2/edit')
     const name = await screen.findByLabelText(/Project name/)
     expect(name).toHaveValue('Menu App')
-    expect(screen.getByLabelText(/Client/)).toHaveDisplayValue('GreenLeaf Cafe')
+    expect(screen.getByLabelText(/Client/)).toHaveValue('GreenLeaf Cafe')
+    expect(screen.getByLabelText(/Client/)).toBeDisabled()
     expect(screen.getByLabelText(/Status/)).toHaveValue('Planning')
 
     await user.selectOptions(screen.getByLabelText(/Status/), 'Completed')
     await user.click(screen.getByRole('button', { name: 'Save changes' }))
 
-    expect(await screen.findByText('Saved changes to “Menu App”')).toBeInTheDocument()
+    expect(await screen.findByText('Saved changes to “Menu App”', {}, { timeout: 3000 })).toBeInTheDocument()
     expect(router.state.location.pathname).toBe('/projects')
     expect(db.projects.find((p) => p.id === 2)?.status).toBe('Completed')
+    expect(db.projects.find((p) => p.id === 2)?.clientId).toBe(2)
+    expect(await screen.findByLabelText('Loading projects')).toBeInTheDocument()
+    expect(await screen.findByRole('link', { name: 'Menu App' }, { timeout: 5000 })).toBeInTheDocument()
   })
 
   it('shows not found for a missing project', async () => {

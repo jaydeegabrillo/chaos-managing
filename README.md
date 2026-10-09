@@ -43,3 +43,17 @@ Your submission will be evaluated based on:
 * Communication of Technical Decisions
 
 Good luck, and we look forward to reviewing your submission.
+
+## Docker setup
+
+From the repository root, start the API, web app, and PostgreSQL database with:
+
+```sh
+docker compose up --build
+```
+
+The web app is available at <http://localhost:8080> and the API at <http://localhost:3000>. Once PostgreSQL is healthy, the API container runs pending migrations and seeders before starting the server. PostgreSQL data is kept in the `postgres_data` volume across restarts.
+
+API startup also loads the sample data once, so the initial client and project lists are populated. To override the development-only database credentials, copy the root `.env.example` to `.env` and edit it. Change the sample password before exposing the services beyond a local development environment. If the browser needs to reach the API at another address, set `VITE_API_URL` in `.env` before building; it is compiled into the frontend image.
+
+To stop the services while retaining database data, run `docker compose down`. To also remove the database volume and its contents, run `docker compose down --volumes`.

@@ -4,7 +4,7 @@ import { Link } from 'react-router'
 import { Button } from '@/components/ui/button'
 import { ErrorPanel } from '@/components/ui/error-panel'
 import { Field, Input, Select, Textarea } from '@/components/ui/fields'
-import { getClientOptions } from '../clients'
+import { getClientName, getClientOptions } from '../clients'
 import { projectFormSchema, type ProjectFormValues } from '../schema'
 import { PROJECT_PRIORITIES, PROJECT_STATUSES } from '../types'
 
@@ -13,6 +13,7 @@ type ProjectFormProps = {
   submitLabel: string
   pendingLabel: string
   isPending: boolean
+  clientReadOnly?: boolean
   serverErrors?: string[]
   onCancel?: () => void
   onSubmit: (values: ProjectFormValues) => void
@@ -23,6 +24,7 @@ export function ProjectForm({
   submitLabel,
   pendingLabel,
   isPending,
+  clientReadOnly = false,
   serverErrors = [],
   onCancel,
   onSubmit,
@@ -47,7 +49,12 @@ export function ProjectForm({
         </Field>
 
         <Field id="clientId" label="Client" required error={errors.clientId?.message} className="sm:col-span-2">
-          {(aria) => (
+          {(aria) => clientReadOnly ? (
+            <>
+              <Input {...aria} value={getClientName(Number(defaultValues.clientId))} disabled />
+              <input id="clientId-value" type="hidden" {...register('clientId')} />
+            </>
+          ) : (
             <Select {...aria} {...register('clientId')}>
               <option value="">Choose a client</option>
               {clientOptions.map((client) => (
@@ -91,7 +98,7 @@ export function ProjectForm({
           {(aria) => <Input {...aria} type="date" {...register('startDate', { deps: ['dueDate'] })} />}
         </Field>
 
-        <Field id="dueDate" label="Due date" error={errors.dueDate?.message} hint="Can’t be earlier than the start date.">
+        <Field id="dueDate" label="Due date" error={errors.dueDate?.message} hint="">
           {(aria) => <Input {...aria} type="date" {...register('dueDate')} />}
         </Field>
       </div>

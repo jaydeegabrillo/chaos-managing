@@ -66,7 +66,7 @@ function EditProject({ id }: { id: number }) {
     updateMutation.mutate(toProjectInput(values), {
       onSuccess: (updated) => {
         toast.success(`Saved changes to “${updated.projectName}”`)
-        navigate('/projects')
+        navigate('/projects', { state: { showTableLoading: true } })
       },
     })
   }
@@ -89,6 +89,7 @@ function EditProject({ id }: { id: number }) {
         submitLabel="Save changes"
         pendingLabel="Saving…"
         isPending={updateMutation.isPending}
+        clientReadOnly
         serverErrors={serverErrors}
         onSubmit={handleSubmit}
       />

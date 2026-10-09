@@ -1,6 +1,6 @@
 import { FolderPlus, Plus } from 'lucide-react'
-import { lazy, Suspense, useDeferredValue, useMemo, useState } from 'react'
-import { useSearchParams } from 'react-router'
+import { lazy, Suspense, useDeferredValue, useEffect, useMemo, useState } from 'react'
+import { useLocation, useSearchParams } from 'react-router'
 import { Button } from '@/components/ui/button'
 import { ErrorPanel } from '@/components/ui/error-panel'
 import { errorMessages } from '@/api/http'
@@ -12,20 +12,40 @@ import { DEFAULT_FILTERS, filterAndSortProjects, readFilters, writeFilters, type
 import { useProjects } from '../queries'
 import type { Project } from '../types'
 
+const EMPTY_PROJECTS: Project[] = []
+
 const ProjectEditDialog = lazy(() => import('../components/ProjectEditDialog'))
 const LazyProjectCreateDialog = lazy(() =>
   import('../components/ProjectCreateDialog').then((module) => ({ default: module.ProjectCreateDialog })),
 )
 
 export default function ProjectsListPage() {
-  const { data: projects, error, isPending, refetch, isRefetching } = useProjects()
+  const location = useLocation()
   const [searchParams, setSearchParams] = useSearchParams()
+  const requestedPage = Number(searchParams.get('page'))
+  const page = Number.isInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1
+  const { data: projectPage, error, isPending, refetch, isRefetching } = useProjects(page)
+  const projects = projectPage?.data ?? EMPTY_PROJECTS
   const [projectToDelete, setProjectToDelete] = useState<Project | null>(null)
   const [projectToEdit, setProjectToEdit] = useState<Project | null>(null)
   const [hasOpenedEdit, setHasOpenedEdit] = useState(false)
+  const [isTableUpdating, setIsTableUpdating] = useState(
+    () =>
+      typeof location.state === 'object' &&
+      location.state !== null &&
+      'showTableLoading' in location.state &&
+      location.state.showTableLoading === true,
+  )
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [hasOpenedCreate, setHasOpenedCreate] = useState(false)
   const [today] = useState(startOfToday)
+  const totalPages = projectPage?.totalPages ?? 1
+
+  useEffect(() => {
+    if (!isTableUpdating) return
+    const timeout = window.setTimeout(() => setIsTableUpdating(false), 2000)
+    return () => window.clearTimeout(timeout)
+  }, [isTableUpdating])
 
   const filters = readFilters(searchParams)
   // Keep typing responsive: filter against a deferred copy of the query.
@@ -45,8 +65,24 @@ export default function ProjectsListPage() {
     [projects, today],
   )
 
+  useEffect(() => {
+    if (projectPage && page > projectPage.totalPages) {
+      const nextParams = new URLSearchParams(searchParams)
+      if (projectPage.totalPages <= 1) nextParams.delete('page')
+      else nextParams.set('page', String(projectPage.totalPages))
+      setSearchParams(nextParams, { replace: true })
+    }
+  }, [page, projectPage, searchParams, setSearchParams])
+
   function updateFilters(patch: Partial<ProjectFilters>) {
     setSearchParams(writeFilters({ ...filters, ...patch }), { replace: true })
+  }
+
+  function setPage(nextPage: number) {
+    const nextParams = new URLSearchParams(searchParams)
+    if (nextPage <= 1) nextParams.delete('page')
+    else nextParams.set('page', String(nextPage))
+    setSearchParams(nextParams)
   }
 
   function handleSort(field: SortField) {
@@ -68,9 +104,9 @@ export default function ProjectsListPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">Projects</h1>
-          {projects ? (
+          {projectPage ? (
             <p className="mt-1 text-sm text-muted">
-              {projects.length} {projects.length === 1 ? 'project' : 'projects'}
+              {projectPage.totalItems} {projectPage.totalItems === 1 ? 'project' : 'projects'}
               {overdueCount > 0 ? (
                 <>
                   , <span className="font-medium text-warning">{overdueCount} overdue</span>
@@ -108,7 +144,7 @@ export default function ProjectsListPage() {
             <ProjectSearchInput query={filters.q} onChange={(q) => updateFilters({ q })} />
           </div>
         </div>
-        {isPending ? (
+        {isPending || isTableUpdating ? (
           <ProjectTableSkeleton />
         ) : error ? (
           <ErrorPanel
@@ -120,7 +156,7 @@ export default function ProjectsListPage() {
               </Button>
             }
           />
-        ) : projects.length === 0 ? (
+        ) : projectPage?.totalItems === 0 ? (
           <div className="flex flex-col items-center rounded-lg border border-dashed border-line bg-surface px-6 py-16 text-center">
             <FolderPlus className="size-8 text-muted" aria-hidden="true" />
             <h2 className="mt-4 font-display text-xl font-semibold">No projects yet</h2>
@@ -149,6 +185,36 @@ export default function ProjectsListPage() {
             />
           </div>
         )}
+        {projectPage && projectPage.totalItems > 0 ? (
+          <div className="flex flex-col gap-3 border-t border-line/80 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+            <p className="text-sm text-muted" aria-live="polite">
+              Showing {(page - 1) * projectPage.limit + 1}–{Math.min(page * projectPage.limit, projectPage.totalItems)} of {projectPage.totalItems}
+            </p>
+            <div className="flex items-center justify-end gap-3">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setPage(page - 1)}
+                disabled={page <= 1 || isPending}
+                aria-label="Go to previous page"
+              >
+                Previous
+              </Button>
+              <span className="text-sm text-muted" aria-label={`Page ${page} of ${totalPages}`}>
+                Page {page} of {totalPages}
+              </span>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setPage(page + 1)}
+                disabled={page >= totalPages || isPending}
+                aria-label="Go to next page"
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        ) : null}
       </section>
 
       <DeleteProjectDialog project={projectToDelete} onClose={() => setProjectToDelete(null)} />
@@ -158,6 +224,7 @@ export default function ProjectsListPage() {
             project={projectToEdit}
             open={projectToEdit !== null}
             onClose={() => setProjectToEdit(null)}
+            onUpdated={() => setIsTableUpdating(true)}
           />
         ) : null}
         {hasOpenedCreate ? <LazyProjectCreateDialog open={isCreateOpen} onClose={() => setIsCreateOpen(false)} /> : null}

@@ -18,6 +18,14 @@ export interface Project {
   updatedAt: string
 }
 
+export interface ProjectPage {
+  data: Project[]
+  page: number
+  limit: number
+  totalItems: number
+  totalPages: number
+}
+
 /** Payload accepted by `POST /projects` and `PUT /projects/:id`. */
 export type ProjectInput = Pick<
   Project,

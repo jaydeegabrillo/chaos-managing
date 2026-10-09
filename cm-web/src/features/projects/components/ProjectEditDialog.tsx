@@ -14,9 +14,10 @@ type ProjectEditDialogProps = {
   project: Project | null
   open: boolean
   onClose: () => void
+  onUpdated?: () => void
 }
 
-export default function ProjectEditDialog({ project, open, onClose }: ProjectEditDialogProps) {
+export default function ProjectEditDialog({ project, open, onClose, onUpdated }: ProjectEditDialogProps) {
   const projectId = project?.id ?? 0
   const { data, error, isPending, refetch } = useProject(projectId, open && project !== null)
   const updateMutation = useUpdateProject(projectId)
@@ -25,6 +26,7 @@ export default function ProjectEditDialog({ project, open, onClose }: ProjectEdi
     updateMutation.mutate(toProjectInput(values), {
       onSuccess: (updated) => {
         toast.success(`Saved changes to “${updated.projectName}”`)
+        onUpdated?.()
         onClose()
       },
     })
@@ -68,6 +70,7 @@ export default function ProjectEditDialog({ project, open, onClose }: ProjectEdi
             submitLabel="Save changes"
             pendingLabel="Saving…"
             isPending={updateMutation.isPending}
+            clientReadOnly
             serverErrors={errorMessages(updateMutation.error)}
             onCancel={() => {
               if (!updateMutation.isPending) onClose()

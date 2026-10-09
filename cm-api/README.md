@@ -129,11 +129,13 @@ Files are created in `database/migrations` and `database/seeders`. Migrations ru
 
 | Method | Path            | Description          |
 | ------ | --------------- | -------------------- |
-| GET    | `/projects`     | List all projects    |
+| GET    | `/projects`     | List all projects, optionally paginated with `?page=1&limit=10` |
 | GET    | `/projects/:id` | Get a single project |
 | POST   | `/projects`     | Create a project     |
 | PUT    | `/projects/:id` | Replace a project    |
 | DELETE | `/projects/:id` | Delete a project     |
+
+Paginated responses return an object with `data`, `page`, `limit`, `totalItems`, and `totalPages`.
 
 Example request body for `POST` and `PUT`:
 

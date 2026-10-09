@@ -1,8 +1,9 @@
 import { request } from '@/api/http'
-import type { Project, ProjectInput } from '@/features/projects/types'
+import type { Project, ProjectInput, ProjectPage } from '@/features/projects/types'
 
-export function listProjects(signal?: AbortSignal) {
-  return request<Project[]>('/projects', { signal })
+export function listProjects(page: number, limit: number, signal?: AbortSignal) {
+  const params = new URLSearchParams({ page: String(page), limit: String(limit) })
+  return request<ProjectPage>(`/projects?${params}`, { signal })
 }
 
 export function getProject(id: number, signal?: AbortSignal) {
