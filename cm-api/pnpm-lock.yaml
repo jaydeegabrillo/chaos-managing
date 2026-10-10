@@ -26,6 +26,9 @@ importers:
       sequelize:
         specifier: ^6.37.7
         version: 6.37.8(pg@8.23.1)(supports-color@5.5.0)
+      sequelize-cli:
+        specifier: ^6.6.3
+        version: 6.6.5
     devDependencies:
       '@types/cors':
         specifier: ^2.8.19
@@ -39,9 +42,6 @@ importers:
       nodemon:
         specifier: ^3.1.14
         version: 3.1.14
-      sequelize-cli:
-        specifier: ^6.6.3
-        version: 6.6.5
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@24.19.1)(typescript@5.9.3)

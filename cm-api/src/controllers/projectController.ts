@@ -4,6 +4,14 @@ import { Project } from "../models/Project";
 import type { ProjectIdParams, ProjectRequestBody } from "../interfaces/Project";
 import { validateProjectId, validateProjectPayload } from "../validators/projectValidator";
 
+const DEFAULT_PAGE = 1;
+const DEFAULT_LIMIT = 10;
+
+type PaginationQuery = {
+    page?: string | string[];
+    limit?: string | string[];
+};
+
 function handleUnexpectedError(res: Response, error: unknown) {
     // Only projects.client_id references another table, so this means the client does not exist.
     if (error instanceof ForeignKeyConstraintError) return res.status(400).json({ errors: ["Client not found."] });
@@ -11,10 +19,43 @@ function handleUnexpectedError(res: Response, error: unknown) {
     return res.status(500).json({ error: "An unexpected error occurred." });
 }
 
-async function getAllProjects(_req: Request, res: Response) {
+function parsePositiveInt(rawValue: unknown, fallback: number) {
+    if (rawValue === undefined || rawValue === null || rawValue === "") return fallback;
+    const value = Array.isArray(rawValue) ? rawValue[0] : rawValue;
+    const parsed = Number(value);
+    if (!Number.isInteger(parsed) || parsed < 1) return null;
+    return parsed;
+}
+
+async function getAllProjects({ query }: Request<Record<string, never>, unknown, unknown, PaginationQuery>, res: Response) {
+    const hasPaginationParams = query.page !== undefined || query.limit !== undefined;
+
     try {
-        const projects = await Project.findAll({ order: [["id", "ASC"]] });
-        return res.json(projects);
+        if (!hasPaginationParams) {
+            const projects = await Project.findAll({ order: [["id", "ASC"]] });
+            return res.json(projects);
+        }
+
+        const page = parsePositiveInt(query.page, DEFAULT_PAGE);
+        const limit = parsePositiveInt(query.limit, DEFAULT_LIMIT);
+
+        if (page === null || limit === null) {
+            return res.status(400).json({ error: "Page and limit must be positive integers." });
+        }
+
+        const { rows, count } = await Project.findAndCountAll({
+            order: [["id", "ASC"]],
+            limit,
+            offset: (page - 1) * limit,
+        });
+
+        return res.json({
+            data: rows,
+            page,
+            limit,
+            totalItems: count,
+            totalPages: Math.ceil(count / limit) || 1,
+        });
     } catch (error) {
         return handleUnexpectedError(res, error);
     }
