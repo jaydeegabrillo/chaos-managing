@@ -6,8 +6,14 @@ export interface ClientPayload {
     address?: string | null;
 }
 
+export const CLIENT_STATUSES = ["Active", "Inactive"] as const;
+export type ClientStatus = (typeof CLIENT_STATUSES)[number];
+
 export interface ClientRecord extends ClientPayload {
     id: number;
+    status: ClientStatus;
+    revenue: number;
+    isNew: boolean;
     createdAt: Date;
     updatedAt: Date;
 }

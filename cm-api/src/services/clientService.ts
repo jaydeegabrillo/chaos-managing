@@ -1,3 +1,4 @@
+import { literal } from "sequelize";
 import { Client } from "../models/Client";
 import type { ClientPayload } from "../interfaces/Client";
 
@@ -22,6 +23,23 @@ function getAllClients(page?: number, limit?: number) {
     }));
 }
 
+// Every client with the number of its projects that are not yet Completed.
+function getClientsWithActiveProjects() {
+    return Client.findAll({
+        attributes: {
+            include: [
+                [
+                    literal(
+                        `(SELECT COUNT(*)::int FROM projects WHERE projects.client_id = "Client"."id" AND projects.status <> 'Completed')`
+                    ),
+                    "activeProjects",
+                ],
+            ],
+        },
+        order: [["id", "ASC"]],
+    });
+}
+
 function getClientById(id: number) {
     return Client.findByPk(id);
 }
@@ -44,4 +62,4 @@ async function deleteClient(id: number) {
     return (await Client.destroy({ where: { id } })) > 0;
 }
 
-export { createClient, deleteClient, getAllClients, getClientById, updateClient };
+export { createClient, deleteClient, getAllClients, getClientById, getClientsWithActiveProjects, updateClient };

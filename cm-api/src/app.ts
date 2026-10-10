@@ -3,6 +3,7 @@ import express from "express";
 
 import "./associates";
 
+import clientRoutes from "./routes/clientRoutes";
 import projectRoutes from "./routes/projectRoutes";
 
 const app = express();
@@ -16,6 +17,7 @@ app.get("/", (req, res) => {
     });
 });
 
+app.use("/", clientRoutes);
 app.use("/", projectRoutes);
 
 export default app;

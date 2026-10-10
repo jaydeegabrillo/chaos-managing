@@ -1,7 +1,7 @@
 import { http, HttpResponse } from 'msw'
 import { setupServer } from 'msw/node'
 import { API_URL } from '@/api/http'
-import type { Project, ProjectInput } from '@/features/projects/types'
+import type { Client, Project, ProjectInput } from '@/features/projects/types'
 
 export function makeProject(overrides: Partial<Project> = {}): Project {
   return {
@@ -19,6 +19,27 @@ export function makeProject(overrides: Partial<Project> = {}): Project {
   }
 }
 
+export const seededClients: Client[] = [
+  ['Acme Corporation', 15200, 2, false],
+  ['GreenLeaf Cafe', 9300, 1, false],
+  ['Bright Realty', 10700, 1, true],
+  ['Nova Fitness', 3800, 1, false],
+  ['HealthFirst Clinic', 5600, 0, false],
+].map(([name, revenue, activeProjects, isNew], index) => ({
+  id: index + 1,
+  name: name as string,
+  contactPerson: null,
+  email: null,
+  phone: null,
+  address: null,
+  status: 'Active',
+  revenue: revenue as number,
+  isNew: isNew as boolean,
+  activeProjects: activeProjects as number,
+  createdAt: '2026-10-04T00:00:00.000Z',
+  updatedAt: '2026-10-04T00:00:00.000Z',
+}))
+
 /** In-memory stand-in for cm-api, reset before every test. */
 export const db = {
   projects: [] as Project[],
@@ -31,6 +52,8 @@ const url = (path: string) => `${API_URL}${path}`
 const notFound = () => HttpResponse.json({ error: 'Project not found.' }, { status: 404 })
 
 export const handlers = [
+  http.get(url('/clients'), () => HttpResponse.json(seededClients)),
+
   http.get(url('/projects'), ({ request }) => {
     const search = new URL(request.url).searchParams
     const page = Number(search.get('page') ?? 1)

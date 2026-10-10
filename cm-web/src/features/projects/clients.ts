@@ -1,6 +1,6 @@
-// cm-api has no client endpoints yet, so the client list mirrors
+// Static client options for the project form. They mirror
 // cm-api/database/seeders/20261004000000-seed-clients.js (ids assume a freshly seeded database).
-// Swap this for a `GET /clients` query once that endpoint exists.
+// `GET /clients` now exists; switch this over to it (see clientQueries.ts) when the form needs live data.
 export interface ClientOption {
   id: number
   name: string
